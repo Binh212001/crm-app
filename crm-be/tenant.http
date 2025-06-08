@@ -1,0 +1,15 @@
+POST https://tenantapi.vmaster.vn/auth/login
+Content-Type: application/json
+x-device-id: 1
+x-os: Windows
+x-device: Mobile
+
+{
+  "identifier": "admin",
+  "password": "11111111"
+}
+
+> {% 
+  const resp = await response.json();
+  client.global.set("accessToken", resp.accessToken);
+%}

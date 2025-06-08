@@ -1,0 +1,34 @@
+GET https://api.cloudflare.com/client/v4/user/tokens/verify
+Authorization: Bearer FLVuI4OKVcvHIygL60Q8ysfR5BpHzGZZWA1eAOBx
+Content-Type:application/json
+
+###
+
+POST https://api.cloudflare.com/client/v4/zones/ca675af885d6b5d58b75fc6ca96b171a/dns_records
+Content-Type: application/json
+Authorization: Bearer FLVuI4OKVcvHIygL60Q8ysfR5BpHzGZZWA1eAOBx
+
+{
+"content":"202.92.6.130",
+"name":"binhPn882",
+"proxied":true,
+"type":"A"
+}
+
+#####
+PUT https://api.cloudflare.com/client/v4/zones/ca675af885d6b5d58b75fc6ca96b171a/dns_records/6aa81460c380abd04d63580dfba147e1
+Content-Type: application/json
+Authorization: Bearer FLVuI4OKVcvHIygL60Q8ysfR5BpHzGZZWA1eAOBx
+
+{
+"content":"202.92.6.130",
+"name":"binhPn882",
+"proxied":false,
+"type":"A"
+}
+#####
+
+POST https://api.bunny.net/videolibrary
+# Content-Type: application/json
+AccessKey: e99d01ea-cd07-4119-8954-4f91499571f009265cb0-c71f-4d7d-8425-769197a55a9b
+accept: application/json

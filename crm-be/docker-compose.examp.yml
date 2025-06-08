@@ -1,0 +1,85 @@
+services:
+  saas-vmaster:
+    image: saas-vmaster
+    container_name: saas-vmaster
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy # Đợi DB sẵn sàng
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      DATABASE_HOST: "db"
+      DATABASE_PORT: "5432"
+    ports:
+      - "${APP_PORT}:5000"
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    sysctls:
+      - net.core.somaxconn=1024
+    networks:
+      - vmaster-backend-network
+
+  db:
+    image: debezium/postgres:16
+    container_name: saas-vmaster-database # Đổi từ vmaster-backend-database cho đồng bộ với saas-vmaster
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./data/postgresql/postgresql.conf:/var/lib/postgresql/data/postgresql.conf
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql # Script tạo saas_master
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      TZ: "UTC"
+    ports:
+      - "${DATABASE_PORT}:5432"
+    mem_limit: 4g
+    cpus: "2.0"
+    networks:
+      - vmaster-backend-network
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    ports:
+      - "${PGADMIN_PORT}:80"
+    volumes:
+      - pgadmin_data:/root/.pgadmin
+      - ./servers.json:/pgadmin4/servers.json # Tự động đăng ký server
+    env_file:
+      - .env
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+      PGADMIN_CONFIG_WTF_CSRF_ENABLED: "False"
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "False"
+    depends_on:
+      db:
+        condition: service_healthy # Đợi DB sẵn sàng
+    networks:
+      - vmaster-backend-network
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+
+networks:
+  vmaster-backend-network:
+    driver: bridge
