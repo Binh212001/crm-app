@@ -6,6 +6,7 @@ import {
   ManyToOne,
   OneToMany,
   Relation,
+  DeleteDateColumn,
 } from "typeorm";
 import { v7 } from "uuid";
 import { Team } from "../team/team.entity";
@@ -55,4 +56,6 @@ export class Employee extends AbstractEntity {
 
   @OneToMany(() => Lead, (lead) => lead.assignedTo)
   leads: Relation<Lead[]>;
+  @DeleteDateColumn()
+  deletedAt: Date;
 }
